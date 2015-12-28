@@ -23,8 +23,8 @@ const (
 )
 
 var (
-	desktopLink = ""
-	minecraftPath = ""
+	desktopLink string
+	minecraftPath string
 )
 
 
@@ -112,5 +112,5 @@ func removeLink(w http.ResponseWriter, req *http.Request) {
 
 
 func killProcess(w http.ResponseWriter, req *http.Request) {
-
+	//todo
 }
