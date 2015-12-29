@@ -4,7 +4,7 @@ import (
 	"os"
 	"fmt"
 	"io/ioutil"
-"html/template"
+	"html/template"
 )
 
 
@@ -42,7 +42,7 @@ func renderTemplate(w http.ResponseWriter, message ...string) {
 }
 
 
-func checkErrorMiddleware(message string, next func(w http.ResponseWriter, req *http.Request)) http.Handler {
+func messageMiddleware(message string, next func(w http.ResponseWriter, req *http.Request)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if len(message) > 0 {
 			renderTemplate(w, message)

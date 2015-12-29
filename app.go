@@ -5,8 +5,13 @@ import (
 	"fmt"
 	"strings"
 	"bufio"
+	"log"
 )
 
+const (
+	markerToken = "minecraft"
+	appToken = "javaw.exe"
+)
 
 func minecraftPIDs() ([]string, error) {
 	out, err := exec.Command("TASKLIST", "/V").Output()
@@ -14,33 +19,33 @@ func minecraftPIDs() ([]string, error) {
 		return nil, err
 	}
 
-	nrTokens := 11
 	pids := make([]string, 0)
 	scanner := bufio.NewScanner(strings.NewReader(string(out)))
 
+	// scan output line by line
 	for scanner.Scan() {
+		// split a line in tokens
 		line := scanner.Text()
-		if !strings.HasPrefix(line, "javaw.exe") {
-			continue
-		}
-
 		tokens := strings.Fields(line)
-		if len(tokens) < nrTokens {
+		// there must be at least 2 tokens (PID is the second) and first should be appToken
+		if len(tokens) < 2 || !strings.HasPrefix(tokens[0], appToken){
 			continue
 		}
 
-		if !strings.HasPrefix(tokens[nrTokens - 2], "Minecraft") &&
-		!strings.HasPrefix(tokens[nrTokens - 1], "Minecraft") {
-			continue
+		// search for marker and get the PID
+		for _, token := range tokens {
+			if strings.HasPrefix(strings.ToLower(token), markerToken) {
+				pids = append(pids, tokens[1])
+				log.Println(line)
+			}
 		}
-
-		pids = append(pids, tokens[1])
 	}
 
 	if len(pids) == 0 {
 		return nil, fmt.Errorf("Cannot find any Minecraft process.")
 	}
 
+	log.Println(pids)
 	return pids, nil
 }
 

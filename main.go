@@ -56,10 +56,10 @@ func main() {
 
 	minecraftPath = mcPath + string(os.PathSeparator) + linkName
 
-	http.Handle("/", checkErrorMiddleware(startupError, homeHandler))
-	http.Handle("/a", checkErrorMiddleware(startupError, addLinkHandler))
-	http.Handle("/d", checkErrorMiddleware(startupError, removeLinkHandler))
-	http.Handle("/kill", checkErrorMiddleware(startupError, killProcessHandler))
+	http.Handle("/", messageMiddleware(startupError, homeHandler))
+	http.Handle("/a", messageMiddleware(startupError, addLinkHandler))
+	http.Handle("/d", messageMiddleware(startupError, removeLinkHandler))
+	http.Handle("/kill", messageMiddleware(startupError, killProcessHandler))
 
 	log.Printf("Server listening on port %d.\n", port)
 	err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
