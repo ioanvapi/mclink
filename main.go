@@ -21,6 +21,7 @@ import (
 	"log"
 	"os"
 	"fmt"
+	"flag"
 )
 
 const (
@@ -38,28 +39,39 @@ var (
 
 
 func main() {
-	var startupError string
+	var startupErrors []string
+
+	logPath := flag.String("log", "", "path to log file")
+	flag.Parse()
+
+	if len(*logPath) > 0 {
+		f, err := os.OpenFile(*logPath, os.O_APPEND | os.O_CREATE | os.O_RDWR, 0666)
+		if err != nil {
+			startupErrors = append(startupErrors, err.Error())
+		} else {
+			defer f.Close()
+			log.SetOutput(f)
+		}
+	}
 
 	public, ok := os.LookupEnv(envPublic)
 	if !ok {
-		startupError = fmt.Sprintf("Cannot find environment variable '%s'.", envPublic)
-		return
+		startupErrors = append(startupErrors, fmt.Sprintf("Cannot find environment variable '%s'.", envPublic))
 	}
 
 	desktopLink = public + string(os.PathSeparator) + "Desktop" + string(os.PathSeparator) + linkName
 
 	mcPath, ok := os.LookupEnv(envMinecraft)
 	if !ok {
-		startupError = fmt.Sprintf("Cannot find environment variable '%s'.", envMinecraft)
-		return
+		startupErrors = append(startupErrors, fmt.Sprintf("Cannot find environment variable '%s'.", envMinecraft))
 	}
 
 	minecraftPath = mcPath + string(os.PathSeparator) + linkName
 
-	http.Handle("/", messageMiddleware(startupError, homeHandler))
-	http.Handle("/a", messageMiddleware(startupError, addLinkHandler))
-	http.Handle("/d", messageMiddleware(startupError, removeLinkHandler))
-	http.Handle("/kill", messageMiddleware(startupError, killProcessHandler))
+	http.Handle("/", messageMiddleware(startupErrors, homeHandler))
+	http.Handle("/a", messageMiddleware(startupErrors, addLinkHandler))
+	http.Handle("/d", messageMiddleware(startupErrors, removeLinkHandler))
+	http.Handle("/kill", messageMiddleware(startupErrors, killProcessHandler))
 
 	log.Printf("Server listening on port %d.\n", port)
 	err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil)

@@ -14,12 +14,13 @@ const (
 )
 
 func minecraftPIDs() ([]string, error) {
+	var pids []string
+
 	out, err := exec.Command("TASKLIST", "/V").Output()
 	if err != nil {
-		return nil, err
+		return pids, err
 	}
 
-	pids := make([]string, 0)
 	scanner := bufio.NewScanner(strings.NewReader(string(out)))
 
 	// scan output line by line
@@ -42,7 +43,7 @@ func minecraftPIDs() ([]string, error) {
 	}
 
 	if len(pids) == 0 {
-		return nil, fmt.Errorf("Cannot find any Minecraft process.")
+		return pids, fmt.Errorf("Cannot find any Minecraft process.")
 	}
 
 	log.Println(pids)

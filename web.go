@@ -42,10 +42,10 @@ func renderTemplate(w http.ResponseWriter, message ...string) {
 }
 
 
-func messageMiddleware(message string, next func(w http.ResponseWriter, req *http.Request)) http.Handler {
+func messageMiddleware(messages []string, next func(w http.ResponseWriter, req *http.Request)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if len(message) > 0 {
-			renderTemplate(w, message)
+		if len(messages) > 0 {
+			renderTemplate(w, messages...)
 			return
 		}
 		next(w, req)
