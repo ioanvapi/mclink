@@ -18,16 +18,8 @@ const (
 func minecraftPIDs() ([]string, error) {
     var pids []string
 
-    syscall.LoadDLL()
-
-    return pids
-}
-
-func minecraftPIDs2() ([]string, error) {
-    var pids []string
-
-//    out, err := exec.Command("TASKLIST", "-V").Output()
-    out, err := exec.Command("cmd", "/C", "TASKLIST", "/V").Output()
+    out, err := exec.Command("TASKLIST", "-V", "-FI", "\"javaw.exe\"").Output()
+//    out, err := exec.Command("cmd", "/C", "TASKLIST", "/V").Output()
     if err != nil {
         return pids, err
     }
