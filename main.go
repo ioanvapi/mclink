@@ -3,16 +3,17 @@ package main
 /*
     Do all these as administrator.
 
-    1. go build executable mclink.exe
-	2. Create system environment variable %minecraft_home% with value the path to minecraft.
-	3. create a link 'minecraft.lnk' to 'minecraft_launcher.exe' in the same folder
+    - go build executable mclink.exe
+	- Create system environment variable %minecraft_home% with value the path to minecraft.
+	- Create system environment variable %minecraft_log% with value the path to a log file.
+	- create a link 'minecraft.lnk' to 'minecraft_launcher.exe' in the same folder
 
-    4. download nssm and use it to install mclink as service (nssm install mclink)
-    4.1 in nssm's gui provide path to mclink.exe
+    - download nssm and use it to install mclink as service (nssm install mclink)
+    - in nssm's gui provide path to mclink.exe
 
-    5. go to windows firewall -> inbound rules -> create New rule for 8123 port
-    6. go to services and start mclink service
-    7. test app with http://localhost:8123 and check desktop
+    - go to windows firewall -> inbound rules -> create New rule for 8123 port
+    - go to services and start mclink service
+    - test app with http://localhost:8123 and check desktop
 
 */
 
@@ -21,11 +22,11 @@ import (
 	"log"
 	"os"
 	"fmt"
-	"flag"
 )
 
 const (
-	envMinecraft = "minecraft_home"
+	envMinecraftHome = "minecraft_home"
+	envMinecraftLog = "minecraft_log"
 	envPublic = "public"
 	linkName = "minecraft.lnk"
 	port = 8123
@@ -41,11 +42,9 @@ var (
 func main() {
 	var startupErrors []string
 
-	logPath := flag.String("log", "", "path to log file")
-	flag.Parse()
-
-	if len(*logPath) > 0 {
-		f, err := os.OpenFile(*logPath, os.O_APPEND | os.O_CREATE | os.O_RDWR, 0666)
+	logPath, ok := os.LookupEnv(envMinecraftLog)
+	if ok {
+		f, err := os.OpenFile(logPath, os.O_APPEND | os.O_CREATE | os.O_RDWR, 0666)
 		if err != nil {
 			startupErrors = append(startupErrors, err.Error())
 		} else {
@@ -61,9 +60,9 @@ func main() {
 
 	desktopLink = public + string(os.PathSeparator) + "Desktop" + string(os.PathSeparator) + linkName
 
-	mcPath, ok := os.LookupEnv(envMinecraft)
+	mcPath, ok := os.LookupEnv(envMinecraftHome)
 	if !ok {
-		startupErrors = append(startupErrors, fmt.Sprintf("Cannot find environment variable '%s'.", envMinecraft))
+		startupErrors = append(startupErrors, fmt.Sprintf("Cannot find environment variable '%s'.", envMinecraftHome))
 	}
 
 	minecraftPath = mcPath + string(os.PathSeparator) + linkName
