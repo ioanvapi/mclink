@@ -5,6 +5,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"html/template"
+	"strconv"
+	"strings"
+	"log"
+	"time"
 )
 
 
@@ -16,20 +20,50 @@ const (
 	<title>Minecraft shortcut</title>
 	<style>
 	button {
-		height:250px;
-		width:400px;
+		height:150px;
+		width:350px;
 		font-size:40px
+	}
+	input {
+		height:50px;
+		width:350px;
+		font-size:30px
 	}
 	</style>
 </head>
 <body>
-<div><button type="button" onclick="location.href='/d'">Delete Link</button></div>
-<div><button type="button" onclick="location.href='/a'">Add Link</button></div>
-<div><button type="button" onclick="location.href='/kill'">KILL</button></div>
+<div>
+<button type="button" onclick="location.href='/d'">Delete Link</button>
+<button type="button" onclick="location.href='/a'">Add Link</button>
+</div>
+<br/>
+<div>
+<button type="button" onclick="location.href='/kill'">KILL</button>
+<button type="button" onclick="schedule()">Schedule</button>
+</div>
+<br/>
+<div><input type="text" id="duration"></div>
+<div>{{range .}}<p>{{.}}</p>{{end}}</div>
 
-{{range .}}<div><p>{{.}}</p></div><br/>{{end}}
-</body></html>`
+<script>
+  function schedule() {
+    var d = document.getElementById("duration").value;
+    var xhttp;
+	if (window.XMLHttpRequest) {
+		xhttp = new XMLHttpRequest();
+	} else {
+		// code for IE6, IE5
+		xhttp = new ActiveXObject("Microsoft.XMLHTTP");
+	}
+  	xhttp.open("GET", "/s?d=" + d, true);
+  	xhttp.send();
+  }
+</script>
+</body>
+</html>`
 )
+
+
 
 func renderTemplate(w http.ResponseWriter, message ...string) {
 	t, err := template.New("home").Parse(homeTemplate)
@@ -79,17 +113,9 @@ func addLinkHandler(w http.ResponseWriter, req *http.Request) {
 
 
 func removeLinkHandler(w http.ResponseWriter, req *http.Request) {
-	// check link does not exist on desktop
-	if _, err := os.Stat(desktopLink); os.IsNotExist(err) {
-		msg := fmt.Sprintf("Link '%s' does not exist on desktop.", linkName)
-		renderTemplate(w, msg)
-		return
-	}
-
-	err := os.Remove(desktopLink)
+	err := removeLink()
 	if err != nil {
-		msg := fmt.Sprintf("Error removing the link '%s' from desktop: \n %s", linkName, err.Error())
-		renderTemplate(w, msg)
+		renderTemplate(w, err.Error())
 		return
 	}
 
@@ -109,7 +135,37 @@ func killProcessHandler(w http.ResponseWriter, req *http.Request) {
 
 }
 
+func scheduleHandler(w http.ResponseWriter, req *http.Request) {
+	// check and parse request parameter
+	dStr := req.URL.Query().Get("d")
+	d, err := strconv.Atoi(strings.TrimSpace(dStr))
+	if err != nil {
+		log.Printf("Cannot convert scheduled duration value '%s'", dStr)
+		return
+	}
+
+	// set Scheduler and the action taken after that duration
+	dm := time.Duration(d) * time.Minute
+	Scheduler.Reset(d, func() {
+		pids, err := minecraftPIDs()
+		if err != nil {
+			log.Println(err.Error())
+			return
+		}
+		killProcesses(pids)
+		removeLink()
+
+		log.Printf("Scheduled Kill executed for pids: '%v'", pids)
+	})
+
+	log.Printf("Kill scheduled after '%v' for time: '%v'", dm, time.Now().Add(dm))
+}
+
 
 func homeHandler(w http.ResponseWriter, req *http.Request) {
-	renderTemplate(w, "")
+	msg := ""
+	if Scheduler.When() != nil {
+		msg = fmt.Sprintf("Kill schedulet at: '%s'", Scheduler.When().Format("15:04"))
+	}
+	renderTemplate(w, msg)
 }
