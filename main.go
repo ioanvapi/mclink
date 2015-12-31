@@ -26,7 +26,7 @@ import (
 
 const (
 	envMinecraftHome = "minecraft_home"
-	envMinecraftLog = "minecraft_log"
+	envMclinkLog = "mclink_log"
 	envPublic = "public"
 	linkName = "minecraft.lnk"
 	port = 8123
@@ -42,7 +42,7 @@ var (
 func main() {
 	var startupErrors []string
 
-	logPath, ok := os.LookupEnv(envMinecraftLog)
+	logPath, ok := os.LookupEnv(envMclinkLog)
 	if ok {
 		f, err := os.OpenFile(logPath, os.O_APPEND | os.O_CREATE | os.O_RDWR, 0666)
 		if err != nil {
