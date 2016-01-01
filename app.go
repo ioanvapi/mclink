@@ -113,7 +113,7 @@ func minecraftPIDs() ([]string, error) {
 }
 
 
-func killProcesses(pids []string) ([]string) {
+func stopProcesses(pids []string) ([]string) {
 	messages := make([]string, 0)
 
 	for _, pid := range pids {
