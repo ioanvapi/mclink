@@ -49,7 +49,7 @@ func main() {
 	http.Handle("/", messageMiddleware(startupErrors, homeHandler))
 	http.Handle("/a", messageMiddleware(startupErrors, addLinkHandler))
 	http.Handle("/d", messageMiddleware(startupErrors, removeLinkHandler))
-	http.Handle("/kill", messageMiddleware(startupErrors, killProcessHandler))
+	http.Handle("/stop", messageMiddleware(startupErrors, stopProcessHandler))
 	http.Handle("/s", messageMiddleware(startupErrors, scheduleHandler))
 
 	log.Printf("Server listening on port %d.\n", port)

@@ -38,7 +38,7 @@ const (
 <body>
 <div><button type="button" onclick="location.href='/d'">Delete Link</button></div>
 <div><button type="button" onclick="location.href='/a'">Add Link</button></div>
-<div><button type="button" onclick="location.href='/kill'">KILL</button></div>
+<div><button type="button" onclick="location.href='/stop'">Stop</button></div>
 <div><button type="button" onclick="schedule()">Schedule</button></div>
 <div><input type="text" id="duration"></div>
 {{range .}}<p>{{.}}</p>{{end}}</div>
@@ -106,14 +106,14 @@ func removeLinkHandler(w http.ResponseWriter, req *http.Request) {
 }
 
 
-func killProcessHandler(w http.ResponseWriter, req *http.Request) {
+func stopProcessHandler(w http.ResponseWriter, req *http.Request) {
     pids, err := minecraftPIDs()
     if err != nil {
         renderTemplate(w, err.Error())
         return
     }
 
-    messages := killProcesses(pids)
+    messages := stopProcesses(pids)
     renderTemplate(w, messages...)
 
 }
@@ -135,20 +135,20 @@ func scheduleHandler(w http.ResponseWriter, req *http.Request) {
             log.Println(err.Error())
             return
         }
-        killProcesses(pids)
+        stopProcesses(pids)
         removeLink()
 
-        log.Printf("Scheduled Kill executed for pids: '%v'", pids)
+        log.Printf("Scheduled Stop executed for pids: '%v'", pids)
     })
 
-    log.Printf("Kill scheduled after '%v' for time: '%s'", dm, time.Now().Add(dm).Format("15:04"))
+    log.Printf("Stop scheduled after '%v' for time: '%s'", dm, time.Now().Add(dm).Format("15:04"))
 }
 
 
 func homeHandler(w http.ResponseWriter, req *http.Request) {
     msg := ""
     if Scheduler.When() != nil {
-        msg = fmt.Sprintf("Kill schedulet at: '%s'", Scheduler.When().Format("15:04"))
+        msg = fmt.Sprintf("Stop scheduled at: '%s'", Scheduler.When().Format("15:04"))
     }
     renderTemplate(w, msg)
 }
