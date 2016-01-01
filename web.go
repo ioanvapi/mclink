@@ -17,15 +17,21 @@ const (
 	<meta charset="UTF-8">
 	<title>Minecraft shortcut</title>
 	<style>
+	div {
+	    padding: 10px;
+	}
 	button {
 		height:150px;
-		width:350px;
-		font-size:40px
+		width: 60%;
+		font-size:40px;
 	}
 	input {
-		height:50px;
-		width:350px;
-		font-size:30px
+		height:100px;
+		width: 60%;
+		font-size:40px;
+	}
+	p {
+	    font-size:40px;
 	}
 	</style>
 </head>
@@ -35,7 +41,7 @@ const (
 <div><button type="button" onclick="location.href='/kill'">KILL</button></div>
 <div><button type="button" onclick="schedule()">Schedule</button></div>
 <div><input type="text" id="duration"></div>
-<div>{{range .}}<p>{{.}}</p>{{end}}</div>
+{{range .}}<p>{{.}}</p>{{end}}</div>
 
 <script>
   function schedule() {
