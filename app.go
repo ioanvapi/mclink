@@ -73,54 +73,44 @@ func addLink() error {
 	return nil
 }
 
+
 func minecraftPIDs() ([]string, error) {
-	var pids []string
+    var pids []string
 
-	// get pid and main window title for every javax process
-	out, err := exec.Command("powershell", "get-process javaw | select-object id,mainwindowtitle").Output()
-	if err != nil {
-		log.Println(err.Error())
-		return pids, fmt.Errorf("Cannot find any Minecraft process.")
-	}
+    out, err := exec.Command("cmd", "/c", "WMIC PROCESS get Caption,Processid,Commandline | findstr javaw.exe").Output()
+    if err != nil {
+        log.Println("CMD error: ", err.Error())
+        return pids, fmt.Errorf("Cannot find any Minecraft process.")
+    }
 
-	log.Printf("Tasklist output: '%s'\n", string(out))
+//    log.Printf("Tasklist output: '%s'\n", string(out))
 
-	scanner := bufio.NewScanner(strings.NewReader(string(out)))
+    scanner := bufio.NewScanner(strings.NewReader(string(out)))
+    for scanner.Scan() {
+        // split a line in tokens
+        line := scanner.Text()
+        tokens := strings.Fields(line)
+        // there must be at least 3 tokens (PID is the 2nd)
+        if len(tokens) < 3 || tokens[0] != "javaw.exe"{
+            continue
+        }
 
-	// scan output line by line
-	for scanner.Scan() {
-		// split a line in tokens
-		line := scanner.Text()
-		tokens := strings.Fields(line)
-		// there must be at least 2 tokens (PID is the 1st)
-		if len(tokens) < 1 {
-			continue
-		}
+        // search for marker and get the PID
+        for _, token := range tokens {
+            if strings.Contains(strings.ToLower(token), "minecraft") {
+                pids = append(pids, strings.TrimSpace(tokens[len(tokens)-1]))
+                log.Println(line)
+                break
+            }
+        }
+    }
 
-		// running as service we don't get the 'window title' as running from cmd
-		// and we cannot select minecraft app only. We have to kill all javaw
-		token := strings.TrimSpace(tokens[0])
-		_, err = strconv.Atoi(token)
-		if err == nil {
-			pids = append(pids, tokens[0])
-		}
-		/*
-				// search for marker and get the PID
-				for _, token := range tokens {
-					if strings.HasPrefix(strings.ToLower(token), markerToken) {
-						pids = append(pids, tokens[0])
-						log.Println(line)
-					}
-				}
-		*/
-	}
+    if len(pids) == 0 {
+        return pids, fmt.Errorf("Cannot find any Minecraft process.")
+    }
 
-	if len(pids) == 0 {
-		return pids, fmt.Errorf("Cannot find any Minecraft process.")
-	}
-
-	log.Println(pids)
-	return pids, nil
+    log.Println(pids)
+    return pids, nil
 }
 
 
