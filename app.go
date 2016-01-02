@@ -126,3 +126,13 @@ func stopProcesses(pids []string) ([]string) {
 	}
 	return messages
 }
+
+
+func popupWindow(msg string) error {
+    cmd := "cmd"
+    args := []string{
+        "/c",
+        fmt.Sprintf("msg * %s", msg),
+    }
+    return exec.Command(cmd, args...).Run()
+}

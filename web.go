@@ -61,6 +61,9 @@ const (
 </html>`
 )
 
+var (
+    alert = "Minecraft se va inchide in 1 minut. Salveaza !!!"
+)
 
 
 func renderTemplate(w http.ResponseWriter, message ...string) {
@@ -139,7 +142,7 @@ func scheduleHandler(w http.ResponseWriter, req *http.Request) {
         removeLink()
 
         log.Printf("Scheduled Stop executed for pids: '%v'", pids)
-    })
+    }, alert)
 
     log.Printf("Stop scheduled after '%v' for time: '%s'", dm, time.Now().Add(dm).Format("15:04"))
 }
