@@ -27,10 +27,10 @@ At this moment these are the features I have implemented:
  * *minecraft_home* environment variable should exist and points to the folder minecraft is installed
  * *mclink_log* environment variable is good to be, pointing to a file where this application write logs
  * the appication port is hardcoded to 8123
- * nssm service application shoul be started with an account with administrativ rights
+ * nssm service application should be started with an account with administrativ rights
  * windows firewall should have an inboud rule for 8123 port
   
-## Instalation steps
+## Installation steps
 
 Basically, I recommend creating a 'service' folder containing mclink.exe, nssm.exe and mclink.log files. It's good to have all these 3 in the same place.
 
