@@ -20,15 +20,15 @@ At this moment these are the features I have implemented:
  * application is accessible in home network (I use my mobile phone in order to control it)
  * it uses 'TASKKILL' windows tool to stop the minecraft process
  * it uses 'WMIC PROCESS' in order to determine PID of minecraft process
- * minecraft runs in a java wirtual machine (javaw.exe windows process), therefore I had to determine jvm's PID
+ * minecraft runs in a java virtual machine (javaw.exe windows process), therefore I had to determine jvm's PID
  * minecraft has two processes (JVMs): one is the launcher and the other is the main game.
  * minecraft.lnk should exist in minecraft home folder and points to 'minecraft_launcher.exe'
  * this application doesn't create the link but copy it from minecraft home folder
  * *minecraft_home* environment variable should exist and points to the folder minecraft is installed
  * *mclink_log* environment variable is good to be, pointing to a file where this application write logs
- * the appication port is hardcoded to 8123
- * nssm service application should be started with an account with administrativ rights
- * windows firewall should have an inboud rule for 8123 port
+ * the application port is hardcoded to 8123
+ * nssm service application should be started with an account with administrative rights
+ * windows firewall should have an inbound rule for 8123 port
   
 ## Installation steps
 
@@ -40,16 +40,16 @@ Basically, I recommend creating a 'service' folder containing mclink.exe, nssm.e
  * create *mclink_log* environment variable pointing to a file in 'service' folder 
  * create the *minecraft.lnk* shortcut for *minecraft_launcher.exe* file in the home folder of minecraft
  * download nssm, copy it into the 'service' folder and use it to install mclink.exe as a service (*nssm install mclink*)
- * go to windows firewall -> inboud rules -> create new rule for 8123 port
- * go to windows services (services.msc as admin) and start mclink service with an admin account (it should successfuly start and you can find a logged line in the mclink.log file in 'service' folder)
+ * go to windows firewall -> inbound rules -> create new rule for 8123 port
+ * go to windows services (services.msc as admin) and start mclink service with an admin account (it should successfully start and you can find a logged line in the mclink.log file in 'service' folder)
  * open a browser locally and test the application accessing http://localhost:8123
  * find the computer IP (*ipconfig*), ex: 192.168.0.10
   
-After instalation, this service will start nomatter which user is logged in at that moment on windows.
+After installation, this service will start no matter which user is logged in at that moment on windows.
 
 ## Access it from Android phone
 
- * open a browser and access the application based on IP determined above, ex: http://192.168.0.10:8123 -> you should see the GUI of the application with serveral buttons (Add link, Delete link, Stop, Schedule)  
+ * open a browser and access the application based on IP determined above, ex: http://192.168.0.10:8123 -> you should see the GUI of the application with several buttons (Add link, Delete link, Stop, Schedule)  
  * save a bookmark for this page
- * go to phone Android Home and create a shorcut based on previous saved bookmark. (long touch on home screen -> select Widgets -> select a bookmark)
+ * go to phone Android Home and create a shortcut based on previous saved bookmark. (long touch on home screen -> select Widgets -> select a bookmark)
 
